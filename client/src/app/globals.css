@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@config "../../tailwind.config.ts";
+
+:root {
+  --background: #F5F2EE; /* warm off-white */
+  --foreground: #1A1A1A; /* near-black */
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #7C6FCD; /* Scandinavian Purple Accent */
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFFFFF;
+  --secondary-foreground: #1A1A1A;
+  --muted: #EEECE8;
+  --muted-foreground: #888885;
+  --accent: #EEECE8;
+  --accent-foreground: #1A1A1A;
+  --destructive: #E57373;
+  --destructive-foreground: #FFFFFF;
+  --border: #EEECE8;
+  --input: #EEECE8;
+  --ring: #7C6FCD;
+  --radius: 0.5rem; /* More minimal radius */
+}
+
+/* No Dark Mode Support as requested */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-2xl: var(--radius);
+  --radius-xl: calc(var(--radius) - 2px);
+  --radius-lg: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 6px);
+  --radius-sm: calc(var(--radius) - 8px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight text-[#1A1A1A];
+  }
+}
+
+@layer components {
+  .editorial-card {
+    @apply bg-white border border-[#EEECE8] transition-all duration-500 ease-out;
+  }
+
+  .editorial-shadow {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .accent-chip {
+    @apply bg-[#7C6FCD] text-white px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .skeleton {
+    @apply animate-pulse bg-muted rounded-lg;
+  }
+}
+
+/* Custom Scrollbar for Premium Feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+}
