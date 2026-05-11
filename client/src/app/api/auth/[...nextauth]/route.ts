@@ -3,6 +3,8 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -20,14 +22,12 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
         try {
-          const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+          const res = await axios.post(`${API_URL}/auth/login`, {
             email: credentials.email,
             password: credentials.password,
           });
           const user = res.data.data;
-          if (user) {
-            return user;
-          }
+          if (user) return user;
           return null;
         } catch (error: any) {
           throw new Error(error.response?.data?.message || "Login failed");
@@ -36,23 +36,30 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account?.provider === "google") {
+    async jwt({ token, user, account, profile }) {
+      // On initial Google sign-in, sync with backend
+      if (account?.provider === "google" && profile) {
         try {
-          const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
-            name: token.name,
-            email: token.email,
-            image: token.picture,
+          const res = await axios.post(`${API_URL}/auth/google`, {
+            name: profile.name,
+            email: profile.email,
+            image: (profile as any).picture,
           });
           const backendUser = res.data.data;
           token.id = backendUser.id;
           token.accessToken = backendUser.token;
+          token.name = backendUser.name;
+          token.email = backendUser.email;
         } catch (error) {
           console.error("Error syncing Google user with backend:", error);
         }
-      } else if (user) {
+      }
+      // On initial credentials sign-in
+      if (user && account?.provider === "credentials") {
         token.id = (user as any).id;
         token.accessToken = (user as any).token;
+        token.name = (user as any).name;
+        token.email = (user as any).email;
       }
       return token;
     },
@@ -60,12 +67,18 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).accessToken = token.accessToken;
+        // Ensure name and email are always set from token
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
       return session;
     },
   },
   pages: {
     signIn: "/auth/signin",
+  },
+  session: {
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
