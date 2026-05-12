@@ -24,7 +24,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
 });
 
 // Upload image and get auto-tags
-router.post('/upload', upload.single('image'), async (req: Request, res: Response) => {
+router.post('/upload', upload.single('image'), async (req: any, res: any) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image uploaded' });
   }
@@ -51,7 +51,7 @@ router.post('/upload', upload.single('image'), async (req: Request, res: Respons
 });
 
 // Manual auto-tag an existing item
-router.post('/auto-tag', async (req: Request, res: Response) => {
+router.post('/auto-tag', async (req: any, res: any) => {
   const { imageUrl } = req.body;
   try {
     const response = await axios.post(`${AI_SERVICE_URL}/auto-tag?image_url=${encodeURIComponent(imageUrl)}`);
