@@ -1,77 +1,59 @@
-# Digital Closet Deployment Guide
+# 🚀 Digital Closet: Bold & Simple Deployment Guide
 
-This guide will help you deploy all three services (Frontend, Backend, AI) to production.
-
-## 1. Prepare for GitHub
-Before pushing to GitHub, ensure you have a `.gitignore` in each folder to avoid uploading sensitive keys.
-
-### Step 1: Create a GitHub Repository
-1. Go to [github.com/new](https://github.com/new).
-2. Name it `digital-closet` and create it.
-
-### Step 2: Push your code
-Open your terminal in the root folder (`wadrobe`) and run:
-```bash
-git init
-git add .
-git commit -m "Initial commit: Digital Closet with Auth and AI"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/digital-closet.git
-git push -u origin main
-```
+Follow these exact steps to get your app live. **You must deploy the AI Service first, then Backend, and finally the Frontend.**
 
 ---
 
-## 2. Deploy Frontend (Vercel)
-**Vercel** is the best place for your Next.js frontend.
+## **PHASE 1: Deploying Your AI Service (Render)**
+We deploy this first so your Backend can use it.
 
-1. Go to [Vercel.com](https://vercel.com) and click **"Add New" -> "Project"**.
-2. Import your `digital-closet` repository.
-3. In **Root Directory**, select `client`.
-4. Add these **Environment Variables**:
-   - `NEXTAUTH_URL`: `https://your-app-name.vercel.app`
-   - `NEXTAUTH_SECRET`: (Generate a random string)
-   - `NEXT_PUBLIC_API_URL`: `https://your-backend-url.render.com/api`
-   - `GOOGLE_ID`: (Your Google Client ID)
-   - `GOOGLE_SECRET`: (Your Google Client Secret)
-5. Click **Deploy**.
+**Step 1:** Go to [Render.com](https://render.com) and click **"New" -> "Web Service"**.
+**Step 2:** Connect your GitHub account and select your `wadrobe` repository.
+**Step 3:** Change the **Root Directory** to: `ai-service`
+**Step 4:** Change the **Runtime** to: `Python 3`
+**Step 5:** Set the **Build Command** to: `pip install -r requirements.txt`
+**Step 6:** Set the **Start Command** to: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+**Step 7:** Scroll down to **Environment Variables** and add:
+*   **`OPENROUTER_API_KEY`** = *(Your OpenRouter API Key)*
 
----
-
-## 3. Deploy Backend (Render)
-**Render** is great for the Node.js server and SQLite.
-
-1. Go to [Render.com](https://render.com) and create a **"New Web Service"**.
-2. Connect your GitHub and select the `digital-closet` repo.
-3. **Root Directory**: `server`
-4. **Build Command**: `npm install && npx prisma generate && npm run build`
-5. **Start Command**: `node dist/index.js`
-6. Add these **Environment Variables**:
-   - `DATABASE_URL`: `file:./dev.db` (For SQLite)
-   - `JWT_SECRET`: (Same as frontend)
-   - `CLOUDINARY_CLOUD_NAME`: (Your Cloudinary Name)
-   - `CLOUDINARY_API_KEY`: (Your Cloudinary Key)
-   - `CLOUDINARY_API_SECRET`: (Your Cloudinary Secret)
-   - `AI_SERVICE_URL`: `https://your-ai-service.render.com`
+**Step 8:** Click **Deploy Web Service**! Once live, **copy the URL** Render gives you (e.g., `https://wadrobe-ai.onrender.com`).
 
 ---
 
-## 4. Deploy AI Service (Render)
-1. Create a **"New Web Service"** on Render.
-2. Select the same repo.
-3. **Root Directory**: `ai-service`
-4. **Runtime**: `Python 3`
-5. **Build Command**: `pip install -r requirements.txt`
-6. **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-7. Add these **Environment Variables**:
-   - `OPENROUTER_API_KEY`: (Your OpenRouter Key)
+## **PHASE 2: Deploying Your Backend Server (Render)**
+Now we deploy the backend and connect it to your AI Service and Neon Database!
+
+**Step 1:** On Render, click **"New" -> "Web Service"** again.
+**Step 2:** Select the `wadrobe` repository.
+**Step 3:** Change the **Root Directory** to: `server`
+**Step 4:** Set the **Build Command** to: `npm install && npx prisma generate && npm run build`
+**Step 5:** Set the **Start Command** to: `npm run start`
+**Step 6:** Under **Environment Variables**, add these exactly:
+*   **`DATABASE_URL`** = `postgresql://neondb_owner:npg_JMf63LhZgKqH@ep-young-band-ap5o25ww-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+*   **`AI_SERVICE_URL`** = *(Paste the AI Service URL you copied from Phase 1)*
+*   **`PORT`** = `4000`
+*   **`JWT_SECRET`** = `fitplan_super_secret_key_123_456_789`
+*   **`CLOUDINARY_CLOUD_NAME`** = `dggtmb420`
+*   **`CLOUDINARY_API_KEY`** = `259176147375763`
+*   **`CLOUDINARY_API_SECRET`** = `-qcSNHhPNG_lQIGBJH-zPY9ksGk`
+
+**Step 7:** Click **Deploy Web Service**! Once live, **copy the URL** Render gives you (e.g., `https://wadrobe-server.onrender.com`).
 
 ---
 
-## 5. Final Step: Connect them
-Once your Backend and AI Service are live, copy their URLs:
-1. Update the `NEXT_PUBLIC_API_URL` in **Vercel** settings.
-2. Update the `AI_SERVICE_URL` in **Render (Backend)** settings.
-3. Redeploy the services.
+## **PHASE 3: Deploying Your Frontend Client (Vercel)**
+Finally, the website your users will see!
 
-### ✅ Your app is now live!
+**Step 1:** Delete any old Vercel project to start fresh.
+**Step 2:** Go to [Vercel.com](https://vercel.com) and click **"Add New" -> "Project"**.
+**Step 3:** Import your `wadrobe` repository.
+**Step 4:** Change the **Root Directory** to: `client`
+**Step 5:** Open the **Environment Variables** section and add these:
+*   **`NEXT_PUBLIC_API_URL`** = *(Paste the Backend URL from Phase 2)*`/api` *(Make sure it ends in `/api`, e.g., `https://wadrobe-server.onrender.com/api`)*
+*   **`NEXTAUTH_SECRET`** = `fitplan_super_secret_key_123_456_789`
+*   **`GOOGLE_ID`** = *(You need to provide your Google Client ID here)*
+*   **`GOOGLE_SECRET`** = *(You need to provide your Google Client Secret here)*
+
+**Step 6:** Click **Deploy**! 
+
+🎉 **You are DONE!** The app is fully live!
