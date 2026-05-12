@@ -26,7 +26,7 @@ Now we deploy the backend and connect it to your AI Service and Neon Database!
 **Step 1:** On Render, click **"New" -> "Web Service"** again.
 **Step 2:** Select the `wadrobe` repository.
 **Step 3:** Change the **Root Directory** to: `server`
-**Step 4:** Set the **Build Command** to: `npm install && npx prisma generate && npm run build`
+**Step 4:** Set the **Build Command** to: `npm install --legacy-peer-deps && npx prisma generate && npm run build`
 **Step 5:** Set the **Start Command** to: `npm run start`
 **Step 6:** Under **Environment Variables**, add these exactly:
 *   **`DATABASE_URL`** = `postgresql://neondb_owner:npg_JMf63LhZgKqH@ep-young-band-ap5o25ww-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
